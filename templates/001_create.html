@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create User (GraphQL Demo)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input { padding: 4px; }
+    button { margin-top: 15px; padding: 6px 12px; }
+    pre { background: #f0f0f0; padding: 10px; }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Create User (GraphQL)</h1>
+  <form id="userForm">
+    <label>Name: <input type="text" id="name" required></label>
+    <label>Email: <input type="email" id="email" required></label>
+    <label>Password: <input type="password" id="password" required></label>
+    <label>Age: <input type="number" id="age"></label>
+    <label>City: <input type="text" id="city"></label>
+    <button type="submit">Create User</button>
+  </form>
+
+  <h3>Result</h3>
+  <pre id="result">(awaiting submission...)</pre>
+
+  <script>
+    $('#userForm').on('submit', function(e) {
+      e.preventDefault();
+
+      const query = `mutation CreateUser($name: String!, $email: String!, $password: String!, $age: Int, $city: String) {\n  createUser(name: $name, email: $email, password: $password, age: $age, city: $city) {\n    user {\n      id\n      name\n      email\n      age\n      city\n    }\n  }\n}`;
+
+      const variables = {
+        name: $('#name').val(),
+        email: $('#email').val(),
+        password: $('#password').val(),
+        age: $('#age').val() ? parseInt($('#age').val()) : null,
+        city: $('#city').val() || null
+      };
+
+      $.ajax({
+        url: '/graphql',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ query, variables }),
+        success: function(response) {
+          $('#result').text(JSON.stringify(response, null, 2));
+        },
+        error: function(xhr, status, error) {
+          $('#result').text('Error: ' + error);
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

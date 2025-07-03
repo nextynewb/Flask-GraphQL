@@ -1,0 +1,5 @@
+flask
+flask-graphql
+graphene
+pymongo
+bcrypt

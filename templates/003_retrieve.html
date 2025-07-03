@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Retrieve Users & Posts (GraphQL Demo)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    button { padding: 8px 14px; }
+    pre { background: #f0f0f0; padding: 10px; margin-top:20px; }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Retrieve Users & Posts (GraphQL)</h1>
+  <button id="loadBtn">Load Users</button>
+  <pre id="result">(click "Load Users" to fetch data)</pre>
+
+  <script>
+    $('#loadBtn').on('click', function() {
+      const query = `{
+  users {
+    id
+    name
+    email
+    city
+    posts {
+      title
+      tags
+    }
+  }
+}`;
+
+      $.ajax({
+        url: '/graphql',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ query }),
+        success: function(response) {
+          $('#result').text(JSON.stringify(response, null, 2));
+        },
+        error: function(xhr, status, error) {
+          $('#result').text('Error: ' + error);
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

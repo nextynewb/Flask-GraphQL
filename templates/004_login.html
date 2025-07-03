@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login (GraphQL Demo)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input { padding: 4px; }
+    button { margin-top: 15px; padding: 6px 12px; }
+    pre { background: #f0f0f0; padding: 10px; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Login (GraphQL)</h1>
+  <form id="loginForm">
+    <label>Email: <input type="email" id="email" required></label>
+    <label>Password: <input type="password" id="password" required></label>
+    <button type="submit">Login</button>
+  </form>
+
+  <h3>Result</h3>
+  <pre id="result">(awaiting login...)</pre>
+
+  <h3>Test Users</h3>
+  <p><strong>Available test accounts:</strong></p>
+  <ul>
+    <li>john@example.com / password123</li>
+    <li>jane@example.com / mypassword</li>
+    <li>bob@example.com / bobsecret</li>
+    <li>alice@example.com / alicepass</li>
+    <li>charlie@example.com / charlie456</li>
+  </ul>
+
+  <script>
+    $('#loginForm').on('submit', function(e) {
+      e.preventDefault();
+
+      const query = `mutation LoginUser($email: String!, $password: String!) {\n  loginUser(email: $email, password: $password) {\n    success\n    message\n    user {\n      id\n      name\n      email\n      city\n    }\n  }\n}`;
+
+      const variables = {
+        email: $('#email').val(),
+        password: $('#password').val()
+      };
+
+      $.ajax({
+        url: '/graphql',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ query, variables }),
+        success: function(response) {
+          $('#result').text(JSON.stringify(response, null, 2));
+          if (response.data && response.data.loginUser && response.data.loginUser.success) {
+            $('#result').addClass('success').removeClass('error');
+          } else {
+            $('#result').addClass('error').removeClass('success');
+          }
+        },
+        error: function(xhr, status, error) {
+          $('#result').text('Error: ' + error).addClass('error').removeClass('success');
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

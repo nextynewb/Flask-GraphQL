@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Resource (GraphQL Demo)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, select { padding: 4px; }
+    button { margin-top: 15px; padding: 6px 12px; }
+    pre { background: #f0f0f0; padding: 10px; }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Delete Resource (GraphQL)</h1>
+  <form id="deleteForm">
+    <label>Type:
+      <select id="type">
+        <option value="user">User</option>
+        <option value="post">Post</option>
+      </select>
+    </label>
+    <label>ID: <input type="text" id="resourceId" required placeholder="MongoDB ObjectId"></label>
+    <button type="submit">Delete</button>
+  </form>
+
+  <h3>Result</h3>
+  <pre id="result">(awaiting submission...)</pre>
+
+  <script>
+    const queryMap = {
+      user: `mutation DeleteUser($id: ObjectIdScalar!){ deleteUser(id:$id){ ok deletedCount } }`,
+      post: `mutation DeletePost($id: ObjectIdScalar!){ deletePost(id:$id){ ok deletedCount } }`
+    };
+
+    $('#deleteForm').on('submit', function(e) {
+      e.preventDefault();
+      const type = $('#type').val();
+      const id = $('#resourceId').val().trim();
+      const query = queryMap[type];
+      const variables = { id };
+
+      $.ajax({
+        url: '/graphql',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ query, variables }),
+        success: function(response) {
+          $('#result').text(JSON.stringify(response, null, 2));
+        },
+        error: function(xhr, status, error) {
+          $('#result').text('Error: ' + error);
+        }
+      });
+    });
+  </script>
+</body>
+</html> 
